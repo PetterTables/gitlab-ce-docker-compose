@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    restart: unless-stopped
+    hostname: 'gitlab.youdomain.com'
+    environment:
+     GITLAB_OMNIBUS_CONFIG: |
+      external_url 'https://gitlab.youdomain.com'
+      # Add any other gitlab.rb configuration here, each on its own line
+      #letsencrypt['enable'] = true
+      nginx['enable'] = true
+      nginx['listen_https'] = true
+      gitlab_rails['gitlab_shell_ssh_port'] = 522
+      nginx['redirect_http_to_https'] = true
+      nginx['ssl_certificate'] = '/etc/gitlab/ssl/gitlab.youdomain.com.crt'
+      nginx['ssl_certificate_key'] = '/etc/gitlab/ssl/gitlab.youdomain.com.key' 
+    ports:
+      - "80:80"
+      - "443:443"
+      - "522:22"
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
